@@ -43,8 +43,8 @@ def index_to_position(index: Index, strides: Strides) -> int:
         Position in storage
     """
 
-    # TODO: Implement for Task 2.1.
-    raise NotImplementedError("Need to implement for Task 2.1")
+    print(index, strides)
+    return index @ strides.T
 
 
 def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
@@ -60,8 +60,9 @@ def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
         out_index : return index corresponding to position.
 
     """
-    # TODO: Implement for Task 2.1.
-    raise NotImplementedError("Need to implement for Task 2.1")
+    for ind, ax in enumerate(reversed(shape)):
+        out_index[-ind - 1] = ordinal % ax
+        ordinal = ordinal // ax
 
 
 def broadcast_index(
@@ -222,8 +223,7 @@ class TensorData:
             range(len(self.shape))
         ), f"Must give a position to each dimension. Shape: {self.shape} Order: {order}"
 
-        # TODO: Implement for Task 2.1.
-        raise NotImplementedError("Need to implement for Task 2.1")
+        return TensorData(self._storage, shape=tuple(np.atleast_1d(self._shape[list(order)]).tolist()), strides=tuple(np.atleast_1d(self._strides[list(order)]).tolist()))
 
     def to_string(self) -> str:
         s = ""
