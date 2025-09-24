@@ -25,24 +25,24 @@ class MapProto(Protocol):
         ...
 
 
-class TensorOps:
+class TensorOps(Protocol):
     @staticmethod
     def map(fn: Callable[[float], float]) -> MapProto:
-        raise NotImplementedError("Not implemented")
+        ...
 
     @staticmethod
     def cmap(fn: Callable[[float], float]) -> Callable[[Tensor, Tensor], Tensor]:
-        raise NotImplementedError("Not implemented")
+        ...
 
     @staticmethod
     def zip(fn: Callable[[float, float], float]) -> Callable[[Tensor, Tensor], Tensor]:
-        raise NotImplementedError("Not implemented")
+        ...
 
     @staticmethod
     def reduce(
         fn: Callable[[float, float], float], start: float = 0.0
     ) -> Callable[[Tensor, int], Tensor]:
-        raise NotImplementedError("Not implemented")
+        ...
 
     @staticmethod
     def matrix_multiply(a: Tensor, b: Tensor) -> Tensor:
