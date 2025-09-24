@@ -32,7 +32,7 @@ class TensorOps(Protocol):
 
     @staticmethod
     def cmap(fn: Callable[[float], float]) -> Callable[[Tensor, Tensor], Tensor]:
-        pass
+        raise NotImplementedError("Not implemented")
 
     @staticmethod
     def zip(fn: Callable[[float, float], float]) -> Callable[[Tensor, Tensor], Tensor]:
@@ -220,6 +220,10 @@ class SimpleOps(TensorOps):
             return out
 
         return ret
+    
+    @staticmethod
+    def cmap(fn: Callable[[float], float]) -> Callable[["Tensor", "Tensor"], "Tensor"]:
+        raise NotImplementedError("Not implemented")
 
     @staticmethod
     def matrix_multiply(a: "Tensor", b: "Tensor") -> "Tensor":
