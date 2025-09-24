@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, Optional, Type
+from typing import TYPE_CHECKING, Any, Callable, Optional
 
 import numpy as np
-from typing_extensions import Protocol
+from typing_extensions import Protocol, runtime_checkable
 
 from . import operators
 from .tensor_data import (
@@ -25,6 +25,7 @@ class MapProto(Protocol):
         ...
 
 
+@runtime_checkable
 class TensorOps(Protocol):
     @staticmethod
     def map(fn: Callable[[float], float]) -> MapProto:
