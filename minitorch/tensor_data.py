@@ -11,8 +11,6 @@ from typing_extensions import TypeAlias
 
 from .operators import prod
 
-from collections import Counter
-
 MAX_DIMS = 32
 
 
@@ -44,7 +42,7 @@ def index_to_position(index: Index, strides: Strides) -> int:
     Returns:
         Position in storage
     """
-    return index @ strides.T
+    return int(index @ strides.T)
 
 
 def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
@@ -158,7 +156,7 @@ class TensorData:
         self._shape = array(shape)
         self.strides = strides
         self.dims = len(strides)
-        self.size = int(prod(shape))
+        self.size = int(prod(list(shape)))
         self.shape = shape
         assert len(self._storage) == self.size
 

@@ -302,7 +302,7 @@ class Tensor:
     def zeros(self, shape: Optional[UserShape] = None) -> Tensor:
         def zero(shape: UserShape) -> Tensor:
             return Tensor.make(
-                [0.0] * int(operators.prod(shape)), shape, backend=self.backend
+                [0.0] * int(operators.prod(list(shape))), shape, backend=self.backend
             )
 
         if shape is None:
@@ -331,7 +331,7 @@ class Tensor:
         assert self.is_leaf(), "Only leaf variables can have derivatives."
         if self.grad is None:
             self.grad = Tensor.make(
-                [0] * int(operators.prod(self.shape)), self.shape, backend=self.backend
+                [0] * int(operators.prod(list(self.shape))), self.shape, backend=self.backend
             )
         self.grad += x
 

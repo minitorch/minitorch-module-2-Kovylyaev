@@ -188,7 +188,7 @@ class LT(Function):
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, Tensor]:
-        return 0, 0
+        return minitorch.Tensor.make([0], (1,)), minitorch.Tensor.make([0], (1,))
 
 
 class EQ(Function):
@@ -199,7 +199,7 @@ class EQ(Function):
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, Tensor]:
-        return 0, 0
+        return minitorch.Tensor.make([0], (1,)), minitorch.Tensor.make([0], (1,))
 
 
 class IsClose(Function):
@@ -294,7 +294,7 @@ def zeros(shape: UserShape, backend: TensorBackend = SimpleBackend) -> Tensor:
         new tensor
     """
     return minitorch.Tensor.make(
-        [0] * int(operators.prod(shape)), shape, backend=backend
+        [0] * int(operators.prod(list(shape))), shape, backend=backend
     )
 
 
@@ -310,7 +310,7 @@ def ones(shape: UserShape, backend: TensorBackend = SimpleBackend) -> Tensor:
         new tensor
     """
     return minitorch.Tensor.make(
-        [1] * int(operators.prod(shape)), shape, backend=backend
+        [1] * int(operators.prod(list(shape))), shape, backend=backend
     )
 
 
