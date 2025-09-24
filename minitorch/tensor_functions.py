@@ -120,7 +120,7 @@ class Sigmoid(Function):
         siged = t1.f.sigmoid_map(t1)
         oness = ones(siged.shape)
         mul1 = siged.f.mul_zip(siged, oness.f.add_zip(oness, -siged))
-        return mul1.f.mul_zip(mul1, grad_output)
+        return grad_output.f.mul_zip(grad_output, mul1)
 
 
 class ReLU(Function):
