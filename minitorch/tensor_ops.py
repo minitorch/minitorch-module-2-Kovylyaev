@@ -220,7 +220,7 @@ class SimpleOps(TensorOps):
             return out
 
         return ret
-    
+
     @staticmethod
     def cmap(fn: Callable[[float], float]) -> Callable[["Tensor", "Tensor"], "Tensor"]:
         raise NotImplementedError("Not implemented")
