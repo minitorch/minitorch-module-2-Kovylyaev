@@ -28,21 +28,21 @@ class MapProto(Protocol):
 class TensorOps:
     @staticmethod
     def map(fn: Callable[[float], float]) -> MapProto:
-        pass
+        return
 
     @staticmethod
     def cmap(fn: Callable[[float], float]) -> Callable[[Tensor, Tensor], Tensor]:
-        pass
+        return
 
     @staticmethod
     def zip(fn: Callable[[float, float], float]) -> Callable[[Tensor, Tensor], Tensor]:
-        pass
+        return
 
     @staticmethod
     def reduce(
         fn: Callable[[float, float], float], start: float = 0.0
     ) -> Callable[[Tensor, int], Tensor]:
-        pass
+        return
 
     @staticmethod
     def matrix_multiply(a: Tensor, b: Tensor) -> Tensor:
@@ -269,7 +269,7 @@ def tensor_map(fn: Callable[[float], float]) -> Any:
         in_shape: Shape,
         in_strides: Strides,
     ) -> None:
-        new_small_shape = shape_broadcast(list(out_shape), list(in_shape))
+        new_small_shape = np.array(shape_broadcast(list(out_shape), list(in_shape)))
         for i in range(prod(list(out_shape))):
             in_ind, out_ind = np.zeros_like(in_shape), np.zeros_like(out_shape)
             to_index(i, in_shape, in_ind)
@@ -327,8 +327,8 @@ def tensor_zip(fn: Callable[[float, float], float]) -> Any:
         b_shape: Shape,
         b_strides: Strides,
     ) -> None:
-        new_a_shape = shape_broadcast(list(out_shape), list(a_shape))
-        new_b_shape = shape_broadcast(out_shape.tolist(), list(b_shape))
+        new_a_shape = np.array(shape_broadcast(list(out_shape), list(a_shape)))
+        new_b_shape = np.array(shape_broadcast(out_shape.tolist(), list(b_shape)))
         for i in range(prod(list(out_shape))):
             a_ind, b_ind, out_ind = np.zeros_like(a_shape), np.zeros_like(b_shape), np.zeros_like(out_shape)
             to_index(i, a_shape, a_ind)
