@@ -359,6 +359,9 @@ class Tensor:
             (inp, inp.expand(self._ensure_tensor(d_in)))
             for inp, d_in in zip(h.inputs, x)
         ]
+    # Горииииит. Авторы плохо написали chain_rule для tensor, потому что для cкаляров
+    # было чётко написано: "This function is also where we filter out constants that were used on the forward pass, but do not need derivatives"
+    # и там мы это сами вручную написали, а здесь авторы этим не озаботились, из-за чего вылетало постоянное AssertionError. 2 часа искал, ааааааааа
 
     def backward(self, grad_output: Optional[Tensor] = None) -> None:
         if grad_output is None:

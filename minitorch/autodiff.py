@@ -85,6 +85,8 @@ def backpropagate(variable: Variable, deriv: Any) -> None:
 
     No return. Should write to its results to the derivative values of each leaf through `accumulate_derivative`.
     """
+    if variable.is_constant():
+        return
     if variable.is_leaf():
         variable.accumulate_derivative(deriv)
         return
