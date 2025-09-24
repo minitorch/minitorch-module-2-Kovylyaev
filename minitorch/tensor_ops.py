@@ -73,7 +73,7 @@ class TensorBackend:
         self.log_map = ops.map(operators.log)
         self.exp_map = ops.map(operators.exp)
         self.id_map = ops.map(operators.id)
-        self.id_cmap = ops.cmap(operators.id)
+        # self.id_cmap = ops.cmap(operators.id)
         self.inv_map = ops.map(operators.inv)
 
         # Zips
