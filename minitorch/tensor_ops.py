@@ -7,7 +7,6 @@ from typing_extensions import Protocol
 
 from . import operators
 from .tensor_data import (
-    MAX_DIMS,
     broadcast_index,
     index_to_position,
     shape_broadcast,
@@ -18,7 +17,7 @@ from .operators import prod
 
 if TYPE_CHECKING:
     from .tensor import Tensor
-    from .tensor_data import Index, Shape, Storage, Strides
+    from .tensor_data import Shape, Storage, Strides
 
 
 class MapProto(Protocol):
@@ -270,15 +269,15 @@ def tensor_map(fn: Callable[[float], float]) -> Any:
         in_shape: Shape,
         in_strides: Strides,
     ) -> None:
-        new_small_shape = shape_broadcast(out_shape, in_shape)
-        for i in range(prod(out_shape)):
+        new_small_shape = shape_broadcast(list(out_shape), list(in_shape))
+        for i in range(prod(list(out_shape))):
             in_ind, out_ind = np.zeros_like(in_shape), np.zeros_like(out_shape)
             to_index(i, in_shape, in_ind)
             to_index(i, out_shape, out_ind)
             if all(out_shape != in_shape):
                 new_in_ind = np.zeros_like(new_small_shape)
-                to_index(i, new_small_shape, new_in_ind)
-                broadcast_index(new_in_ind, new_small_shape, in_shape, in_ind)
+                to_index(i, list(new_small_shape), new_in_ind)
+                broadcast_index(new_in_ind, list(new_small_shape), in_shape, in_ind)
             out[index_to_position(out_ind, out_strides)] = fn(in_storage[index_to_position(in_ind, in_strides)])
 
     return _map
@@ -328,23 +327,22 @@ def tensor_zip(fn: Callable[[float, float], float]) -> Any:
         b_shape: Shape,
         b_strides: Strides,
     ) -> None:
-        new_a_shape = shape_broadcast(out_shape, a_shape)
-        new_b_shape = shape_broadcast(out_shape, b_shape)
-        for i in range(prod(out_shape)):
+        new_a_shape = shape_broadcast(list(out_shape), list(a_shape))
+        new_b_shape = shape_broadcast(out_shape.tolist(), list(b_shape))
+        for i in range(prod(list(out_shape))):
             a_ind, b_ind, out_ind = np.zeros_like(a_shape), np.zeros_like(b_shape), np.zeros_like(out_shape)
             to_index(i, a_shape, a_ind)
             to_index(i, b_shape, b_ind)
             to_index(i, out_shape, out_ind)
             if all(out_shape != a_shape):
                 new_a_ind = np.zeros_like(new_a_shape)
-                to_index(i, new_a_shape, new_a_ind)
-                broadcast_index(new_a_ind, new_a_shape, a_shape, a_ind)
+                to_index(i, list(new_a_shape), new_a_ind)
+                broadcast_index(new_a_ind, list(new_a_shape), a_shape, a_ind)
             if all(out_shape != b_shape):
                 new_b_ind = np.zeros_like(new_b_shape)
-                to_index(i, new_b_shape, new_b_ind)
-                broadcast_index(new_b_ind, new_b_shape, b_shape, b_ind)
+                to_index(i, list(new_b_shape), new_b_ind)
+                broadcast_index(new_b_ind, list(new_b_shape), b_shape, b_ind)
             out[index_to_position(out_ind, out_strides)] = fn(a_storage[index_to_position(a_ind, a_strides)], b_storage[index_to_position(b_ind, b_strides)])
-
 
     return _zip
 
@@ -379,7 +377,7 @@ def tensor_reduce(fn: Callable[[float, float], float]) -> Any:
         a_strides: Strides,
         reduce_dim: int,
     ) -> None:
-        for i in range(prod(a_shape)):
+        for i in range(prod(list(a_shape))):
             a_ind = np.zeros_like(a_shape)
             to_index(i, a_shape, a_ind)
             out_ind = a_ind.copy()

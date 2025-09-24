@@ -297,6 +297,7 @@ def zeros(shape: UserShape, backend: TensorBackend = SimpleBackend) -> Tensor:
         [0] * int(operators.prod(shape)), shape, backend=backend
     )
 
+
 def ones(shape: UserShape, backend: TensorBackend = SimpleBackend) -> Tensor:
     """
     Produce a ones tensor of size `shape`.
