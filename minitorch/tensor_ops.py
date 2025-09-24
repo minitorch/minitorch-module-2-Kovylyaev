@@ -1,22 +1,23 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, Optional, Type
+from typing import TYPE_CHECKING, Any, Callable, Optional
 
 import numpy as np
 from typing_extensions import Protocol
 
 from . import operators
 from .tensor_data import (
-    MAX_DIMS,
     broadcast_index,
     index_to_position,
     shape_broadcast,
     to_index,
 )
 
+from .operators import prod
+
 if TYPE_CHECKING:
     from .tensor import Tensor
-    from .tensor_data import Index, Shape, Storage, Strides
+    from .tensor_data import Shape, Storage, Strides
 
 
 class MapProto(Protocol):
@@ -24,14 +25,14 @@ class MapProto(Protocol):
         ...
 
 
-class TensorOps:
+class TensorOps(Protocol):
     @staticmethod
     def map(fn: Callable[[float], float]) -> MapProto:
         pass
 
     @staticmethod
     def cmap(fn: Callable[[float], float]) -> Callable[[Tensor, Tensor], Tensor]:
-        pass
+        raise NotImplementedError("Not implemented")
 
     @staticmethod
     def zip(fn: Callable[[float, float], float]) -> Callable[[Tensor, Tensor], Tensor]:
@@ -47,11 +48,11 @@ class TensorOps:
     def matrix_multiply(a: Tensor, b: Tensor) -> Tensor:
         raise NotImplementedError("Not implemented in this assignment")
 
-    cuda = False
+    cuda: bool = False
 
 
 class TensorBackend:
-    def __init__(self, ops: Type[TensorOps]):
+    def __init__(self, ops: TensorOps):
         """
         Dynamically construct a tensor backend based on a `tensor_ops` object
         that implements map, zip, and reduce higher-order functions.
@@ -72,7 +73,7 @@ class TensorBackend:
         self.log_map = ops.map(operators.log)
         self.exp_map = ops.map(operators.exp)
         self.id_map = ops.map(operators.id)
-        self.id_cmap = ops.cmap(operators.id)
+        # self.id_cmap = ops.cmap(operators.id)
         self.inv_map = ops.map(operators.inv)
 
         # Zips
@@ -221,6 +222,10 @@ class SimpleOps(TensorOps):
         return ret
 
     @staticmethod
+    def cmap(fn: Callable[[float], float]) -> Callable[["Tensor", "Tensor"], "Tensor"]:
+        raise NotImplementedError("Not implemented")
+
+    @staticmethod
     def matrix_multiply(a: "Tensor", b: "Tensor") -> "Tensor":
         raise NotImplementedError("Not implemented in this assignment")
 
@@ -268,8 +273,16 @@ def tensor_map(fn: Callable[[float], float]) -> Any:
         in_shape: Shape,
         in_strides: Strides,
     ) -> None:
-        # TODO: Implement for Task 2.3.
-        raise NotImplementedError("Need to implement for Task 2.3")
+        new_small_shape = np.array(shape_broadcast(list(out_shape), list(in_shape)))
+        for i in range(prod(list(out_shape))):
+            in_ind, out_ind = np.zeros_like(in_shape), np.zeros_like(out_shape)
+            to_index(i, in_shape, in_ind)
+            to_index(i, out_shape, out_ind)
+            if all(out_shape != in_shape):
+                new_in_ind = np.zeros_like(new_small_shape)
+                to_index(i, new_small_shape, new_in_ind)
+                broadcast_index(new_in_ind, new_small_shape, in_shape, in_ind)
+            out[index_to_position(out_ind, out_strides)] = fn(in_storage[index_to_position(in_ind, in_strides)])
 
     return _map
 
@@ -318,8 +331,22 @@ def tensor_zip(fn: Callable[[float, float], float]) -> Any:
         b_shape: Shape,
         b_strides: Strides,
     ) -> None:
-        # TODO: Implement for Task 2.3.
-        raise NotImplementedError("Need to implement for Task 2.3")
+        new_a_shape = np.array(shape_broadcast(list(out_shape), list(a_shape)))
+        new_b_shape = np.array(shape_broadcast(out_shape.tolist(), list(b_shape)))
+        for i in range(prod(list(out_shape))):
+            a_ind, b_ind, out_ind = np.zeros_like(a_shape), np.zeros_like(b_shape), np.zeros_like(out_shape)
+            to_index(i, a_shape, a_ind)
+            to_index(i, b_shape, b_ind)
+            to_index(i, out_shape, out_ind)
+            if all(out_shape != a_shape):
+                new_a_ind = np.zeros_like(new_a_shape)
+                to_index(i, new_a_shape, new_a_ind)
+                broadcast_index(new_a_ind, new_a_shape, a_shape, a_ind)
+            if all(out_shape != b_shape):
+                new_b_ind = np.zeros_like(new_b_shape)
+                to_index(i, new_b_shape, new_b_ind)
+                broadcast_index(new_b_ind, new_b_shape, b_shape, b_ind)
+            out[index_to_position(out_ind, out_strides)] = fn(a_storage[index_to_position(a_ind, a_strides)], b_storage[index_to_position(b_ind, b_strides)])
 
     return _zip
 
@@ -354,10 +381,14 @@ def tensor_reduce(fn: Callable[[float, float], float]) -> Any:
         a_strides: Strides,
         reduce_dim: int,
     ) -> None:
-        # TODO: Implement for Task 2.3.
-        raise NotImplementedError("Need to implement for Task 2.3")
+        for i in range(prod(list(a_shape))):
+            a_ind = np.zeros_like(a_shape)
+            to_index(i, a_shape, a_ind)
+            out_ind = a_ind.copy()
+            out_ind[reduce_dim] = 0
+            out[index_to_position(out_ind, out_strides)] = fn(out[index_to_position(out_ind, out_strides)], a_storage[index_to_position(a_ind, a_strides)])
 
     return _reduce
 
 
-SimpleBackend = TensorBackend(SimpleOps)
+SimpleBackend = TensorBackend(SimpleOps())

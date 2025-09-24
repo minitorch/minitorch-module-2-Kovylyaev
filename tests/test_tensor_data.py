@@ -64,6 +64,11 @@ def test_index(tensor_data: TensorData) -> None:
     # Check that all indices are within the size.
     for ind in tensor_data.indices():
         pos = tensor_data.index(ind)
+        print()
+        print("Tensor shape: ", tensor_data.shape)
+        print("Needed index: ", ind)
+        print("Tensor strides: ", tensor_data.strides)
+        print("Calculated pos: ", pos)
         assert pos >= 0 and pos < tensor_data.size
 
     base = [0] * tensor_data.dims

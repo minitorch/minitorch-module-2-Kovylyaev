@@ -302,7 +302,7 @@ class Tensor:
     def zeros(self, shape: Optional[UserShape] = None) -> Tensor:
         def zero(shape: UserShape) -> Tensor:
             return Tensor.make(
-                [0.0] * int(operators.prod(shape)), shape, backend=self.backend
+                [0.0] * int(operators.prod(list(shape))), shape, backend=self.backend
             )
 
         if shape is None:
@@ -331,7 +331,7 @@ class Tensor:
         assert self.is_leaf(), "Only leaf variables can have derivatives."
         if self.grad is None:
             self.grad = Tensor.make(
-                [0] * int(operators.prod(self.shape)), self.shape, backend=self.backend
+                [0] * int(operators.prod(list(self.shape))), self.shape, backend=self.backend
             )
         self.grad += x
 
@@ -359,6 +359,9 @@ class Tensor:
             (inp, inp.expand(self._ensure_tensor(d_in)))
             for inp, d_in in zip(h.inputs, x)
         ]
+    # Горииииит. Авторы плохо написали chain_rule для tensor, потому что для cкаляров
+    # было чётко написано: "This function is also where we filter out constants that were used on the forward pass, but do not need derivatives"
+    # и там мы это сами вручную написали, а здесь авторы этим не озаботились, из-за чего вылетало постоянное AssertionError. 2 часа искал, ааааааааа
 
     def backward(self, grad_output: Optional[Tensor] = None) -> None:
         if grad_output is None:
