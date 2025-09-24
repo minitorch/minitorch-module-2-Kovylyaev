@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Callable, Optional, Type
 
 import numpy as np
-from typing_extensions import Protocol, runtime_checkable
+from typing_extensions import Protocol
 
 from . import operators
 from .tensor_data import (
@@ -25,7 +25,6 @@ class MapProto(Protocol):
         ...
 
 
-@runtime_checkable
 class TensorOps(Protocol):
     @staticmethod
     def map(fn: Callable[[float], float]) -> MapProto:
@@ -53,7 +52,7 @@ class TensorOps(Protocol):
 
 
 class TensorBackend:
-    def __init__(self, ops: Type[TensorOps]):
+    def __init__(self, ops: Type[SimpleOps]):
         """
         Dynamically construct a tensor backend based on a `tensor_ops` object
         that implements map, zip, and reduce higher-order functions.
