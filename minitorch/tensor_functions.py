@@ -183,23 +183,25 @@ class All(Function):
 class LT(Function):
     @staticmethod
     def forward(ctx: Context, a: Tensor, b: Tensor) -> Tensor:
-        # ctx.save_for_backward(a, b)
+        ctx.save_for_backward(a, b)
         return a.f.lt_zip(a, b)
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, Tensor]:
-        return minitorch.Tensor.make([0], (1,)), minitorch.Tensor.make([0], (1,))
+        (a, b,) = ctx.saved_values
+        return zeros(a.shape), zeros(b.shape)
 
 
 class EQ(Function):
     @staticmethod
     def forward(ctx: Context, a: Tensor, b: Tensor) -> Tensor:
-        # ctx.save_for_backward(a, b)
+        ctx.save_for_backward(a, b)
         return a.f.eq_zip(a, b)
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, Tensor]:
-        return minitorch.Tensor.make([0], (1,)), minitorch.Tensor.make([0], (1,))
+        (a, b,) = ctx.saved_values
+        return zeros(a.shape), zeros(b.shape)
 
 
 class IsClose(Function):
