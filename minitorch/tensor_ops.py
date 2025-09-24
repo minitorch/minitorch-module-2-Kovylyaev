@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Callable, Optional, Type
 
 import numpy as np
@@ -25,24 +26,28 @@ class MapProto(Protocol):
         ...
 
 
-class TensorOps:
+class TensorOps(ABC):
     @staticmethod
+    @abstractmethod
     def map(fn: Callable[[float], float]) -> MapProto:
-        return
+        pass
 
     @staticmethod
+    @abstractmethod
     def cmap(fn: Callable[[float], float]) -> Callable[[Tensor, Tensor], Tensor]:
-        return
+        pass
 
     @staticmethod
+    @abstractmethod
     def zip(fn: Callable[[float, float], float]) -> Callable[[Tensor, Tensor], Tensor]:
-        return
+        pass
 
     @staticmethod
+    @abstractmethod
     def reduce(
         fn: Callable[[float, float], float], start: float = 0.0
     ) -> Callable[[Tensor, int], Tensor]:
-        return
+        pass
 
     @staticmethod
     def matrix_multiply(a: Tensor, b: Tensor) -> Tensor:

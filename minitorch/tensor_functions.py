@@ -156,7 +156,7 @@ class Exp(Function):
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tensor:
         (t1,) = ctx.saved_values
-        return t1.f.mul_zip(t1.f.exp_map(t1), grad_output)
+        return grad_output.f.mul_zip(grad_output, t1.f.exp_map(t1))
 
 
 class Sum(Function):
@@ -332,7 +332,7 @@ def rand(
     Returns:
         :class:`Tensor` : new tensor
     """
-    vals = [random.random() for _ in range(int(operators.prod(shape)))]
+    vals = [random.random() for _ in range(int(operators.prod(list(shape))))]
     tensor = minitorch.Tensor.make(vals, shape, backend=backend)
     tensor.requires_grad_(requires_grad)
     return tensor
