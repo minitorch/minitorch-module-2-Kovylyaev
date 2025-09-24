@@ -25,7 +25,7 @@ class MapProto(Protocol):
         ...
 
 
-class TensorOps:
+class TensorOps(Protocol):
     @staticmethod
     def map(fn: Callable[[float], float]) -> MapProto:
         pass
@@ -52,7 +52,7 @@ class TensorOps:
 
 
 class TensorBackend:
-    def __init__(self, ops: Type[SimpleOps]):
+    def __init__(self, ops: type[TensorOps]):
         """
         Dynamically construct a tensor backend based on a `tensor_ops` object
         that implements map, zip, and reduce higher-order functions.
